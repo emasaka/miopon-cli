@@ -17,11 +17,10 @@ class Miopon
         allparams = @params.merge(moreparams)
         url = gen_url(allparams)
         # Don't give passwords as command argument!
-        rtn = Open3.popen2e({'MIOPON_USER' => user, 'MIOPON_PASSWORD' => pass},
-                            'phantomjs', JSFILE, url ) do |i, o, t|
-          i.close
-          o.read
-        end
+        rtn, status = Open3.capture2({ 'MIOPON_USER' => user,
+                                       'MIOPON_PASSWORD' => pass },
+                                     'phantomjs', JSFILE, url );
+        status.success? or raise # TODO: make some exception class
         store_tokens(JSON.parse(rtn), allparams)
       end
 
