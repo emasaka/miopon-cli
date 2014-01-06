@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'erb'
+require 'thor'
 require 'pathname'
 $:.unshift Pathname.new(__FILE__).realpath.join('../../lib') if __FILE__ == $0
 
@@ -90,16 +91,32 @@ __LOG_FMT__
   end
 end
 
-if __FILE__ == $0
-  cli = MioponCLI.new
-  case ARGV[0]
-  when 'info'
-    cli.info_cmd
-  when 'log'
-    cli.log_cmd
-  when 'on'
-    cli.switch_cmd(true)
-  when 'off'
-    cli.switch_cmd(false)
+class MioponApp < Thor
+  package_name 'miopon'
+
+  desc 'info', 'show coupon information'
+  def info
+    MioponCLI.new.info_cmd
   end
+
+  desc 'log', 'show packet log'
+  def log
+    MioponCLI.new.log_cmd
+  end
+
+  desc 'on', 'switch on coupon'
+  def on
+    MioponCLI.new.switch_cmd(true)
+  end
+
+  desc 'off', 'switch off coupon'
+  def off
+    MioponCLI.new.switch_cmd(false)
+  end
+end
+
+if __FILE__ == $0
+
+  MioponApp.start
+
 end
