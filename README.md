@@ -26,4 +26,9 @@ Manipulates IIJmio mobile SIM's coupon information.
 
 ## AUTHOR
 
-emasaka
+Masakazu Takahashi (emasaka)
+
+## License
+
+This software is released under the MIT License,
+see [LICENSE.txt](LICENSE.txt).
