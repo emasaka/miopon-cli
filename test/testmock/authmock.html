@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function($){
+  token = state = tokenType = expiresIn = '';
+    if (window.location.href.search(/pagemove=no/) == -1) {
+      $('#submit').click(function() {
+        token = 'user:' + $('#username').val();
+        state = 'password:' + $('#password').val();
+        tokenType = 'Bearer';
+        expiresIn = '500';
+      });
+    }
+});
+</script>
+</head>
+<body>
+<input type="text" name="username" id="username" />
+<input type="password" name="password" id="password" />
+<a href="#" id="submit">Login</a>
+</body>
+</html>
