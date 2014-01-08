@@ -13,7 +13,7 @@ class MioponCLI
   end
 
   def info_cmd
-    info = @client.coupon_info
+    info = @client.coupon_info['couponInfo'][0]
     maybe_save_config
 
     print ERB.new(<<'__INFO_FMT__', nil, '-').result(binding)
@@ -34,7 +34,7 @@ __INFO_FMT__
   end
 
   def log_cmd
-    info = @client.packet_log
+    info = @client.packet_log['packetLogInfo'][0]
     maybe_save_config
 
     print ERB.new(<<'__LOG_FMT__', nil, '-').result(binding)
@@ -51,7 +51,7 @@ __LOG_FMT__
   end
 
   def switch_cmd(on)
-    info = @client.coupon_info
+    info = @client.coupon_info['couponInfo'][0]
     hdo = info['hdoInfo'][0]
     if hdo['couponUse'] != on
       @client.switch([[hdo['hdoServiceCode'], on]])

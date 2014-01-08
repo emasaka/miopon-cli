@@ -22,11 +22,11 @@ class Miopon
     attr_reader :access_token, :expires_at
 
     def coupon_info
-      call_api { @api.coupon_info }['couponInfo'][0]
+      call_api { @api.coupon_info }
     end
 
     def packet_log
-      call_api { @api.packet_log }['packetLogInfo'][0]
+      call_api { @api.packet_log }
     end
 
     def switch(params)
