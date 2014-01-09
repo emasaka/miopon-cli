@@ -6,6 +6,10 @@ require 'json'
 class Miopon
   class API
     class Auth
+
+      class PhantomJSError < StandardError; end
+      class ResponseError < StandardError; end
+
       def initialize(params)
         @params = params
       end
@@ -17,10 +21,10 @@ class Miopon
         allparams = @params.merge(moreparams)
         url = gen_url(allparams)
         # Don't give passwords as command argument!
-        rtn, status = Open3.capture2({ 'MIOPON_USER' => user,
-                                       'MIOPON_PASSWORD' => pass },
-                                     'phantomjs', JSFILE, url );
-        status.success? or raise # TODO: make some exception class
+        rtn, err, status = Open3.capture3({ 'MIOPON_USER' => user,
+                                          'MIOPON_PASSWORD' => pass },
+                                        'phantomjs', JSFILE, url )
+        status.success? or raise PhantomJSError, err
         store_tokens(JSON.parse(rtn), allparams)
       end
 
@@ -33,9 +37,12 @@ class Miopon
       end
 
       def store_tokens(data, params)
-        # TODO: make some exception class
-        data['token_type'] == 'Bearer' or raise
-        data['state'] == params[:state] or raise
+        if data['token_type'] != 'Bearer'
+          raise ResponseError, "token_type was #{data['token_type']}, instead of Bearer"
+        end
+        if data['state'] != params[:state]
+          raise ResponseError, "state was #{data['state']}, instead of #{params[:state]}"
+        end
 
         @access_token = data['access_token']
         @state = data['state']

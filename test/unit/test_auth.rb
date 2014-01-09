@@ -36,10 +36,11 @@ class TestAuth < Test::Unit::TestCase
 
     success = Object.new
     def success.success?; true end
-    Open3.stub(:capture2, [ JSON.generate({ 'access_token' => access_token,
+    Open3.stub(:capture3, [ JSON.generate({ 'access_token' => access_token,
                                             'expires_in' => expires_in,
                                             'state' => @param[:state],
                                             'token_type' => 'Bearer' }),
+                            '',
                             success ]) do
       assert_nothing_raised('auth without error') do
         @auth.by_phantomjs('someuser', 'somepass', @param)
@@ -54,8 +55,8 @@ class TestAuth < Test::Unit::TestCase
   def test_auth_server_error
     not_success = Object.new
     def not_success.success?; false end
-    Open3.stub(:capture2, ['[]', not_success ]) do
-      assert_raise(RuntimeError, 'auth server_error') do
+    Open3.stub(:capture3, ['[]', '', not_success ]) do
+      assert_raise(Miopon::API::Auth::PhantomJSError, 'auth server_error') do
         @auth.by_phantomjs('someuser', 'somepass', @param)
       end
     end
@@ -65,8 +66,8 @@ class TestAuth < Test::Unit::TestCase
     success = Object.new
     def success.success?; true end
 
-    Open3.stub(:capture2, ['{"token_type": "dummy"}', success]) do
-      assert_raise(RuntimeError, 'auth tokentype_error') do
+    Open3.stub(:capture3, ['{"token_type": "dummy"}', '', success]) do
+      assert_raise(Miopon::API::Auth::ResponseError, 'auth tokentype_error') do
         @auth.by_phantomjs('someuser', 'somepass', @param)
       end
     end
@@ -76,9 +77,9 @@ class TestAuth < Test::Unit::TestCase
     success = Object.new
     def success.success?; true end
 
-    assert_raise(RuntimeError, 'auth state_error') do
-      Open3.stub(:capture2, [ '{"token_type": "Bearer", "state": "dummy"}',
-                              success ]) do
+    assert_raise(Miopon::API::Auth::ResponseError, 'auth state_error') do
+      Open3.stub(:capture3, [ '{"token_type": "Bearer", "state": "dummy"}',
+                              '', success ]) do
         @auth.by_phantomjs('someuser', 'somepass', @param)
       end
     end
