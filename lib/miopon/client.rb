@@ -3,8 +3,17 @@ require 'miopon/api/auth'
 
 class Miopon
   class Client
+
+    class ParameterError < StandardError; end
+    class HttpError < StandardError; end
+    %w(403 413 429 500 503).each do |code|
+      const_set("C#{code}Error", Class.new(StandardError))
+    end
+
     def initialize(dev_id, params = {})
-      raise unless dev_id && dev_id.instance_of?(String)
+      unless dev_id && String === dev_id
+        raise ParameterError, "dev_id: #{dev_id.inspect}"
+      end
       @dev_id = dev_id
 
       @access_token = params[:access_token]
@@ -16,7 +25,7 @@ class Miopon
 
       unless (@access_token && @expires_at) ||
           (@username && @password && @redirect_uri)
-        raise                   # TODO: make some exception class
+        raise ParameterError, 'need access_token+expires_at or username+password+redirect_uri'
       end
     end
 
@@ -40,8 +49,14 @@ class Miopon
 
       res = yield
       if res[:status] != '200'
-        # TODO: make some exception class
-        raise "#{res[:status]}: #{res[:body]['returnCode']}"
+        begin
+          error_class = self.class.const_get("C#{res[:status]}Error")
+          message = res[:body]['returnCode']
+        rescue NameError
+          error_class = HttpError
+          message = res[:status]
+        end
+        raise error_class, message
       end
       res[:body]
     end
