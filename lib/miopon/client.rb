@@ -4,6 +4,7 @@ require 'miopon/api/auth'
 class Miopon
   class Client
     def initialize(dev_id, params = {})
+      raise unless dev_id && dev_id.instance_of?(String)
       @dev_id = dev_id
 
       @access_token = params[:access_token]

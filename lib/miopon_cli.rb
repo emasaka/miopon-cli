@@ -7,7 +7,6 @@ class MioponCLI
   def initialize
     # TODO: create new config if not exist
     @conf = load_config
-    raise unless @conf[:dev_id]
     @conf[:expires_at] = @conf[:expires_at].to_i if @conf[:expires_at]
     @client = Miopon::Client.new(@conf[:dev_id], @conf)
   end
