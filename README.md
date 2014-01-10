@@ -22,7 +22,8 @@ Manipulates IIJmio mobile SIM's coupon information.
 ## REQUIREMENTS
 
 * Ruby (>= 1.9)
-* PhantomJS
+* PhantomJS (It's not necessary if you have active access token)
+* developer ID of IIJmio coupon switch API
 
 ## AUTHOR
 
