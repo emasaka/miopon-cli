@@ -7,15 +7,16 @@ require 'miopon_cli'
 
 class MioponApp < Thor
   package_name 'miopon'
+  class_option :format, :enum => %w(text json), default: 'text'
 
   desc 'info', 'show coupon information'
   def info
-    MioponCLI.new.info_cmd
+    MioponCLI.new.info_cmd(options[:format])
   end
 
   desc 'log', 'show packet log'
   def log
-    MioponCLI.new.log_cmd
+    MioponCLI.new.log_cmd(options[:format])
   end
 
   desc 'on', 'switch on coupon'

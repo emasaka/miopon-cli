@@ -1,4 +1,5 @@
 require 'erb'
+require 'json'
 require 'miopon/client'
 
 class MioponCLI
@@ -11,11 +12,7 @@ class MioponCLI
     @client = Miopon::Client.new(@conf[:dev_id], @conf)
   end
 
-  def info_cmd
-    info = @client.coupon_info['couponInfo'][0]
-    maybe_save_config
-
-    print ERB.new(<<'__INFO_FMT__', nil, '-').result(binding)
+  INFO_FMT = <<'__INFO_FMT__'
 hddServiceCode: <%= info['hddServiceCode'] %>
 hdoInfo:
 <% info['hdoInfo'].each_with_index do |hdo, i| -%>
@@ -30,13 +27,8 @@ coupon:
   - expire: <%= coupon['expire'].sub(/(\d{4})(\d{2})(\d{2})/, '\1.\2.\3') %>, volume: <%= coupon['volume'] %>, type: <%= coupon['type'] %>
 <%- end -%>
 __INFO_FMT__
-  end
 
-  def log_cmd
-    info = @client.packet_log['packetLogInfo'][0]
-    maybe_save_config
-
-    print ERB.new(<<'__LOG_FMT__', nil, '-').result(binding)
+  LOG_FMT = <<'__LOG_FMT__'
 hddServiceCode: <%= info['hddServiceCode'] %>
 hdoInfo:
 <% info['hdoInfo'].each_with_index do |hdo, i| -%>
@@ -47,6 +39,31 @@ hdoInfo:
   <%- end -%>
 <%- end -%>
 __LOG_FMT__
+
+  def info_cmd(format)
+    rtn = @client.coupon_info
+    maybe_save_config
+
+    case format
+    when 'text'
+      info = rtn['couponInfo'][0]
+      print ERB.new(INFO_FMT, nil, '-').result(binding)
+    when 'json'
+      print JSON.generate(rtn)
+    end
+  end
+
+  def log_cmd(format)
+    rtn = @client.packet_log
+    maybe_save_config
+
+    case format
+    when 'text'
+      info = rtn['packetLogInfo'][0]
+      print ERB.new(LOG_FMT, nil, '-').result(binding)
+    when 'json'
+      print JSON.generate(rtn)
+    end
   end
 
   def switch_cmd(on)
