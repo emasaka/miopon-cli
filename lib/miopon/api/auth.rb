@@ -22,8 +22,9 @@ class Miopon
         url = gen_url(allparams)
         # Don't give passwords as command argument!
         rtn, err, status = Open3.capture3({ 'MIOPON_USER' => user,
-                                          'MIOPON_PASSWORD' => pass },
-                                        'phantomjs', JSFILE, url )
+                                            'MIOPON_PASSWORD' => pass },
+                                          'phantomjs', '--ssl-protocol=any',
+                                          JSFILE, url )
         status.success? or raise PhantomJSError, err
         store_tokens(JSON.parse(rtn), allparams)
       end
