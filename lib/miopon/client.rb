@@ -69,7 +69,11 @@ class Miopon
       unless @access_token
         auth = Miopon::API::Auth.new(dev_id: @dev_id,
                                      redirect_uri: @redirect_uri )
-        auth.by_phantomjs(@username, @password, state: now.to_s)
+        if @username && @password
+          auth.by_phantomjs(@username, @password, state: now.to_s)
+        else
+          auth.by_external(state: now.to_s)
+        end
         @access_token = auth.access_token
         @expires_at = auth.expires_in.to_i + now
       end

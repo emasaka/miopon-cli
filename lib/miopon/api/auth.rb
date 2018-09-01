@@ -29,6 +29,17 @@ class Miopon
         store_tokens(JSON.parse(rtn), allparams)
       end
 
+      def by_external(moreparams = {})
+        allparams = @params.merge(moreparams)
+        url = gen_url(allparams)
+        print "Please access the following URL:\n"
+        print url
+        print "\n"
+        print "Please paste the redirected URL here:\n"
+        rtn = STDIN.gets.chomp
+        store_tokens(Hash[CGI::parse(URI::parse(rtn).fragment).map{|k,v| [k,v.join('')]}], allparams)
+      end
+
       def gen_url(params)
         'https://api.iijmio.jp/mobile/d/v1/authorization/?' +
           'response_type=token' +
